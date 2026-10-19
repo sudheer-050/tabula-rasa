@@ -1,5 +1,8 @@
 # 🧩 tabula-rasa
 
+[Read the technical paper](other-projects/cascade-patch-v2/PAPER.md) · [PDF](other-projects/cascade-patch-v2/paper.pdf) · [Evidence and reproduction](other-projects/cascade-patch-v2/REPRODUCIBILITY.md)
+
+
 <div align="center">
 
 ### My entry for [ARC Prize 2026 · ARC-AGI-3](https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3) — a Kaggle competition for genuine reasoning

@@ -92,6 +92,14 @@ def test_frame_diff_helper_and_syntax_error():
     assert "SyntaxError" in sb.run("def (").text
 
 
+def test_segmentation_helper_is_callable_from_model_code():
+    g, s, cfg = make()
+    sb = Sandbox(s, cfg)
+    out = sb.run("seg = segmentation()\nprint(len(seg['nodes']), seg['adjacency_list'])")
+    assert not out.error
+    assert "2 []" in out.text                             # player pixel + level dot, not touching
+
+
 def test_commit_plan_runs_a_list_and_stops_on_level_up():
     g, s, cfg = make()
     sb = Sandbox(s, cfg)
@@ -99,6 +107,23 @@ def test_commit_plan_runs_a_list_and_stops_on_level_up():
     assert out.level_up and out.executed_actions == 3           # FakeGame levels at x>=5, started x=2
     assert len(g.game_run.history) == 3
     assert out.used_commit_plan and out.blocked == 0
+
+
+def test_bare_action_also_accepts_a_list_directly():
+    g, s, cfg = make()
+    sb = Sandbox(s, cfg)
+    out = sb.run("action(['ACTION1', 'ACTION1', 'ACTION1'])")
+    assert out.level_up and out.executed_actions == 3
+    assert out.used_commit_plan                                  # same mechanism, no separate name needed
+
+
+def test_action_with_packed_tuple_args_is_not_mistaken_for_a_batch():
+    g, s, cfg = make()
+    sb = Sandbox(s, cfg)
+    out = sb.run("r = action(('ACTION1', None, None))\nprint(r.line())")
+    assert not out.used_commit_plan
+    assert "unknown action" in out.text.lower() or "REFUSED" in out.text  # not silently treated as 3 actions
+    assert out.executed_actions == 0
 
 
 def test_bare_action_blocked_once_probe_streak_hits_limit():

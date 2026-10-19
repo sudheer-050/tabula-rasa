@@ -119,7 +119,15 @@ class Sandbox:
             "objects": P.object_changes(a, b),
         }
 
-    def _action(self, name, x=None, y=None) -> ActionResult:
+    def _action(self, name, x=None, y=None) -> ActionResult | list[ActionResult]:
+        if isinstance(name, list) and x is None and y is None:
+            # Deliberately list-only, not tuple: action(("CLICK", 10, 20)) must stay a single
+            # click with packed args, not a 3-item batch -- tuples are what a batch's own
+            # entries look like (see _parse_action_spec), lists are the batch itself.
+            # action() itself accepts a batch -- the single-vs-batch split is an API seam
+            # the model shouldn't have to think about; commit_plan() stays as an explicit
+            # alias since prompts and the forced-commitment refusal already name it.
+            return self._commit_plan(name)
         call = self._call
         if call is None or call.cancelled.is_set():
             raise ToolTimeout()
@@ -208,6 +216,7 @@ class Sandbox:
             "commit_plan": self._commit_plan,
             "frame_diff": self._frame_diff,
             "segments": lambda g=None, **kw: P.segments(s.grid if g is None else g, **kw),
+            "segmentation": lambda g=None, **kw: P.segmentation(s.grid if g is None else g, **kw),
             "ascii_grid": lambda g=None: P.ascii_grid(s.grid if g is None else g),
             "diff_summary": lambda a=None, b=None: P.diff_summary(s.prev_grid if a is None else a, s.grid if b is None else b),
         }

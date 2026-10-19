@@ -114,6 +114,116 @@ def _components(mask: np.ndarray) -> list[tuple[int, int, int, int, int]]:
     return comps
 
 
+def _components_with_mask(mask: np.ndarray) -> list[tuple[int, int, int, int, int, np.ndarray]]:
+    """Like ``_components`` but also returns each component's own cropped boolean mask
+    (aligned to its bbox), needed for a shape hash, true adjacency, and containment --
+    a separate function so ``segments``/``object_changes`` keep their existing, tested
+    contract untouched."""
+    try:
+        from scipy import ndimage
+
+        labeled, n = ndimage.label(mask)
+        comps = []
+        for idx, sl in enumerate(ndimage.find_objects(labeled), start=1):
+            if sl is None:
+                continue
+            ys, xs = sl
+            local = labeled[sl] == idx
+            comps.append((int(ys.start), int(ys.stop - 1), int(xs.start), int(xs.stop - 1), int(local.sum()), local))
+        return comps
+    except Exception:  # noqa: BLE001 - any scipy/numpy ABI problem falls through to the fallback
+        pass
+    h, w = mask.shape
+    seen = np.zeros_like(mask, dtype=bool)
+    comps = []
+    for sy, sx in zip(*np.nonzero(mask)):
+        if seen[sy, sx]:
+            continue
+        stack = [(int(sy), int(sx))]
+        seen[sy, sx] = True
+        cells = []
+        while stack:
+            y, x = stack.pop()
+            cells.append((y, x))
+            for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
+                if 0 <= ny < h and 0 <= nx < w and mask[ny, nx] and not seen[ny, nx]:
+                    seen[ny, nx] = True
+                    stack.append((ny, nx))
+        ys = [c[0] for c in cells]
+        xs = [c[1] for c in cells]
+        y0, y1, x0, x1 = min(ys), max(ys), min(xs), max(xs)
+        local = np.zeros((y1 - y0 + 1, x1 - x0 + 1), dtype=bool)
+        for y, x in cells:
+            local[y - y0, x - x0] = True
+        comps.append((y0, y1, x0, x1, len(cells), local))
+    return comps
+
+
+def segmentation(grid: Any, background: int | None = None, min_size: int = 1, limit: int = 200) -> dict:
+    """A graph view of the board: 4-connected same-colour components as nodes, each with a
+    position-invariant ``hash`` (equal hash = same shape and colour regardless of where it
+    moved -- use it to track an object across frames, or spot duplicates in one frame) and
+    ``children`` (ids of objects whose bbox it fully encloses), plus an ``adjacency_list`` of
+    which objects actually touch (true 4-connected adjacency between their pixels, not just
+    overlapping bounding boxes). Nodes are ordered top-most, then left-most.
+
+    Returns ``{"nodes": [...], "adjacency_list": [[i, j], ...]}``.
+    """
+    arr = as_array(grid)
+    if background is None:
+        vals, counts = np.unique(arr, return_counts=True)
+        background = int(vals[int(np.argmax(counts))])
+    raw: list[dict] = []
+    for color in np.unique(arr).tolist():
+        if color == background:
+            continue
+        for y0, y1, x0, x1, size, local in _components_with_mask(arr == color):
+            if size < min_size:
+                continue
+            raw.append({"color": int(color), "y0": y0, "y1": y1, "x0": x0, "x1": x1, "size": size, "mask": local})
+    raw.sort(key=lambda c: (c["y0"], c["x0"]))
+    raw = raw[:limit]
+
+    h, w = arr.shape
+    full_masks: list[np.ndarray] = []
+    nodes: list[dict] = []
+    for i, c in enumerate(raw):
+        shape_bits = np.packbits(c["mask"]).tobytes()
+        nodes.append({
+            "id": i,
+            "color": c["color"],
+            "size": c["size"],
+            "hash": hash((c["color"], c["mask"].shape, shape_bits)),
+            "x0": c["x0"], "y0": c["y0"], "x1": c["x1"], "y1": c["y1"],
+            "children": [],
+        })
+        full = np.zeros((h, w), dtype=bool)
+        full[c["y0"]:c["y1"] + 1, c["x0"]:c["x1"] + 1] = c["mask"]
+        full_masks.append(full)
+
+    for i, a in enumerate(raw):
+        for j, b in enumerate(raw):
+            if i == j:
+                continue
+            same_box = (a["x0"], a["y0"], a["x1"], a["y1"]) == (b["x0"], b["y0"], b["x1"], b["y1"])
+            if not same_box and a["x0"] <= b["x0"] and a["y0"] <= b["y0"] and a["x1"] >= b["x1"] and a["y1"] >= b["y1"]:
+                nodes[i]["children"].append(j)
+
+    adjacency_list: list[list[int]] = []
+    for i in range(len(raw)):
+        m = full_masks[i]
+        dilated = np.zeros((h, w), dtype=bool)
+        dilated[:-1, :] |= m[1:, :]
+        dilated[1:, :] |= m[:-1, :]
+        dilated[:, :-1] |= m[:, 1:]
+        dilated[:, 1:] |= m[:, :-1]
+        for j in range(i + 1, len(raw)):
+            if np.any(dilated & full_masks[j]):
+                adjacency_list.append([i, j])
+
+    return {"nodes": nodes, "adjacency_list": adjacency_list}
+
+
 def segments(grid: Any, background: int | None = None, min_size: int = 1, limit: int = 60) -> list[dict]:
     """4-connected same-colour components, largest first. Background defaults to the modal colour."""
     arr = as_array(grid)

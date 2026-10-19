@@ -64,3 +64,46 @@ def test_shape_mismatch_is_safe():
     b = np.zeros((32, 32), dtype=np.int8)
     assert "size changed" in P.diff_summary(a, b)
     assert P.diff_mask(a, b).all()
+
+
+def test_segmentation_nodes_match_segments():
+    seg = P.segmentation(grid())
+    assert {n["color"] for n in seg["nodes"]} == {8, 3}
+    assert len(seg["nodes"]) == 2
+    big = next(n for n in seg["nodes"] if n["color"] == 8)
+    assert big["size"] == 9 and (big["x0"], big["y0"], big["x1"], big["y1"]) == (20, 10, 22, 12)
+    assert big["children"] == []                        # unrelated dot elsewhere isn't "inside" it
+    assert seg["adjacency_list"] == []                   # the two objects don't touch
+
+
+def test_segmentation_hash_is_position_invariant_and_shape_sensitive():
+    a = np.zeros((64, 64), dtype=np.int8)
+    a[10:13, 10:13] = 8                                   # a 3x3 block of color 8
+    b = np.zeros((64, 64), dtype=np.int8)
+    b[40:43, 50:53] = 8                                   # same shape and colour, moved elsewhere
+    c = np.zeros((64, 64), dtype=np.int8)
+    c[10:12, 10:13] = 8                                   # same colour, different shape (2x3 not 3x3)
+    ha = P.segmentation(a)["nodes"][0]["hash"]
+    hb = P.segmentation(b)["nodes"][0]["hash"]
+    hc = P.segmentation(c)["nodes"][0]["hash"]
+    assert ha == hb                                       # moved but otherwise identical -> same identity
+    assert ha != hc                                       # different shape -> different identity
+
+
+def test_segmentation_containment_and_adjacency():
+    g = np.zeros((64, 64), dtype=np.int8)
+    g[10, 10:15] = 5
+    g[14, 10:15] = 5
+    g[10:15, 10] = 5
+    g[10:15, 14] = 5                                      # a hollow 5x5 ring outline of colour 5
+    g[12, 12] = 7                                          # a dot in the middle, not touching the ring
+    g[20:22, 20:22] = 8                                    # a 2x2 block
+    g[20:22, 22:24] = 9                                    # a 2x2 block immediately to its right -- touching
+    seg = P.segmentation(g)
+    by_color = {n["color"]: n for n in seg["nodes"]}
+    ring, dot, left, right = by_color[5], by_color[7], by_color[8], by_color[9]
+    assert dot["id"] in ring["children"]                   # dot is enclosed by the ring's bbox
+    assert dot["id"] not in left["children"] and dot["id"] not in right["children"]
+    pair = {tuple(sorted(e)) for e in seg["adjacency_list"]}
+    assert tuple(sorted((left["id"], right["id"]))) in pair   # touching blocks are adjacent
+    assert tuple(sorted((ring["id"], dot["id"]))) not in pair  # contained but not touching -> not adjacent

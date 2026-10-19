@@ -1,0 +1,17 @@
+[project]
+name = "arcduck2"
+version = "0.1.0"
+description = "From-scratch agent layer for ARC-AGI-3 on the TAAF framework"
+requires-python = ">=3.12"
+dependencies = ["numpy", "scipy", "requests", "pillow"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

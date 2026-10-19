@@ -1,10 +1,10 @@
-# 🦆 arcduck2
+# 🧩 tabula-rasa
 
 <div align="center">
 
-### An LLM agent that learns to play never-seen interactive puzzles — built, broken, diagnosed, and rebuilt in the open
+### My entry for [ARC Prize 2026 · ARC-AGI-3](https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3) — a Kaggle competition for genuine reasoning
 
-**[ARC Prize 2026 · ARC-AGI-3](https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3)** — Francois Chollet's benchmark for genuine reasoning: no training data, no memorized solutions, just a grid, five unlabeled actions, and a puzzle the agent has never seen before.
+An LLM agent that learns to play never-seen interactive puzzles: no training data, no memorized solutions, just a grid, five unlabeled actions, and a puzzle it's never seen before. Built, measured, and rebuilt in the open.
 
 [![Tests](https://img.shields.io/badge/tests-88%20passed%20(100%25)-brightgreen.svg?logo=pytest&logoColor=white)]()
 [![Python](https://img.shields.io/badge/python-3.12-blue?logo=python&logoColor=white)]()
@@ -14,11 +14,13 @@
 
 ---
 
+This repo tracks the competition, not one agent — the current solver (`arcduck2`, in `src/`) is the second full rewrite and won't be the last. *Tabula rasa*: every game starts as a blank slate, nothing assumed, everything learned from observation — which is both what the agent has to do each game, and how this project has been built: ship an experiment, read what the data actually says, adjust.
+
 ## The journey
 
 **v1 — inherit.** Started from a community "Franzen stack" harness patched with a prefix-replay cache. Scored **29.97**.
 
-**v2 — rewrite.** Rebuilt the entire agent loop from scratch: a persistent Python sandbox the model programs against, fatal-path memory, context management, a priority scheduler across parallel games. More sophisticated, untested on the real leaderboard. First real submission: **8.01** — a regression.
+**v2 — rewrite.** Rebuilt the entire agent loop from scratch: a persistent Python sandbox the model programs against, fatal-path memory, context management, a priority scheduler across parallel games. A bigger architectural bet, and the first real submission came back at **8.01** — a clear signal to stop guessing and start measuring.
 
 **v3 — diagnose, don't guess.** Pulled the actual trace logs instead of theorizing. The scoring formula squares action-efficiency per level (`(human_actions / ai_actions)²`), so wasted actions are brutally expensive. The data ruled out the obvious suspect (dying and retrying) — that happened maybe once a game. The real cost was **"drip" play**: dozens of tiny one-or-two-action tool calls, never committing to a plan, burning the clock without ever dying. One run spent 80 calls and 175 actions stuck on a single level and never left it.
 
@@ -63,6 +65,10 @@ uv pip install --python .venv/Scripts/python.exe -e . --no-deps
 ```
 
 `tufa-arc-agi-framework` is the community TAAF harness this plugs into: https://github.com/tonghuikang/daniel-franzen-arc-agi-3
+
+## Other projects for this competition
+
+[`other-projects/`](other-projects/) holds earlier, standalone attempts at the same competition that came before `arcduck2` — smaller in scope, kept for the record rather than active development. See [`other-projects/cascade-patch-v2`](other-projects/cascade-patch-v2) for the prefix-replay patch that scored 29.97, an early benchmark this project has been working back up toward.
 
 ## License
 

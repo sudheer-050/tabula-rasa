@@ -1,0 +1,262 @@
+{
+  "review_date": "2026-10-19",
+  "score_provenance": {
+    "verified_score": 29.97,
+    "verified_version": 2,
+    "script_version_id": 356244130,
+    "notebook_url": "https://www.kaggle.com/code/sudheer56/arc-agi-3-franzen-stack-cascade-patch-v2?scriptVersionId=356244130",
+    "verification_date": "2026-10-19",
+    "method": "Signed-in read-only Kaggle UI: Public Score 29.97; Version 2 of 5",
+    "access": "Notebook currently private; screenshots accompany this release",
+    "earlier_user_report": 29.92,
+    "source_byte_identity_to_download": "Local downloaded artifact fingerprinted separately; no claim that screenshot authenticates its SHA256"
+  },
+  "artifacts": [
+    {
+      "name": "arc-agi-3-franzen-stack-cascade-patch-v2.ipynb",
+      "sha256": "acfc2a851de207ac661fc04ac33aad844f78283d6a1fa42c8a4e7d4c5dce920e",
+      "cells": 25,
+      "key_cells": {
+        "2": {
+          "characters": 498799,
+          "source_sha256": "6fdcd1ae7445c0cfc26eec1047363aa0c196c867d289a35b6f64403b5a43dce2"
+        },
+        "4": {
+          "characters": 5175,
+          "source_sha256": "9850ba064f46a851bfe7d29817a46c5fddd76f8eafcd6735a499da57cadac50c"
+        },
+        "12": {
+          "characters": 18718,
+          "source_sha256": "c362ce556dc35ed0725c31b3f5c60b86bc83a2d94152fd1a109116813a4b5cf8"
+        },
+        "16": {
+          "characters": 1066,
+          "source_sha256": "de90ce1129ff5df4022c8793b63b6a16c0c1d9b50cfe38bb16821b4cc9a128bf"
+        },
+        "18": {
+          "characters": 7699,
+          "source_sha256": "e62fee35941f560c05adad30d713b4a827e5cb8f3698245752350043d220f298"
+        },
+        "22": {
+          "characters": 4220,
+          "source_sha256": "d390c0bc7cfb9d2e67fddd20e1be24b11930e886789916ce0cf467c492922266"
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "artifact": "v2fix_offline_2026-10-08.log",
+      "sha256": "37d0bad4bb898ab49af490ff6125f84648ad5b82fc70f47427cfb7d147020e20",
+      "games": 25,
+      "run_count": 100,
+      "outcomes": {
+        "won": 31,
+        "gave_up": 69
+      },
+      "completed_levels": 401,
+      "mean_score": 45.93620000000001,
+      "completion_only_ceiling": 47.68896103896103,
+      "efficiency_headroom": 1.752761038961026,
+      "actions": 20104,
+      "generated_tokens": 17691742,
+      "tokens_per_action": 880.0110425785913,
+      "score_reconstruction_max_error": 0.004725682279513421,
+      "summary": {
+        "games": "25",
+        "passes": "4",
+        "runs": "100 (won: 31)",
+        "started": "2026-10-08 03:49:23",
+        "ended": "2026-10-08 12:00:29",
+        "mean score": "45.94",
+        "median score": "37.90",
+        "total actions": "20104",
+        "total tokens": "17691742",
+        "duration": "8h 11m 5s"
+      }
+    },
+    {
+      "artifact": "v4sum_offline_2026-10-09.log",
+      "sha256": "23bab50832c4a39b2373586f6127b5053d6d4f1385aa5eb62f218cd1d13af008",
+      "games": 25,
+      "run_count": 100,
+      "outcomes": {
+        "won": 12,
+        "gave_up": 88
+      },
+      "completed_levels": 257,
+      "mean_score": 23.691999999999997,
+      "completion_only_ceiling": 24.195598845598848,
+      "efficiency_headroom": 0.5035988455988516,
+      "actions": 9621,
+      "generated_tokens": 16979812,
+      "tokens_per_action": 1764.8697640577902,
+      "score_reconstruction_max_error": 0.004793388429752188,
+      "summary": {
+        "games": "25",
+        "passes": "4",
+        "runs": "100 (won: 12)",
+        "started": "2026-10-09 01:29:04",
+        "ended": "2026-10-09 09:40:01",
+        "mean score": "23.69",
+        "median score": "8.33",
+        "total actions": "9621",
+        "total tokens": "16979812",
+        "duration": "8h 10m 56s"
+      }
+    }
+  ],
+  "per_game_deltas": [
+    {
+      "game": "r11l",
+      "v2fix": 97.7,
+      "v4sum": 29.762499999999996,
+      "delta": -67.9375
+    },
+    {
+      "game": "tr87",
+      "v2fix": 100.0,
+      "v4sum": 32.144999999999996,
+      "delta": -67.855
+    },
+    {
+      "game": "ar25",
+      "v2fix": 100.0,
+      "v4sum": 44.445,
+      "delta": -55.555
+    },
+    {
+      "game": "cd82",
+      "v2fix": 47.3725,
+      "v4sum": 4.4,
+      "delta": -42.972500000000004
+    },
+    {
+      "game": "tu93",
+      "v2fix": 61.51,
+      "v4sum": 19.8125,
+      "delta": -41.6975
+    },
+    {
+      "game": "m0r0",
+      "v2fix": 71.43,
+      "v4sum": 39.2875,
+      "delta": -32.142500000000005
+    },
+    {
+      "game": "dc22",
+      "v2fix": 35.714999999999996,
+      "v4sum": 5.952499999999999,
+      "delta": -29.762499999999996
+    },
+    {
+      "game": "re86",
+      "v2fix": 58.629999999999995,
+      "v4sum": 31.2525,
+      "delta": -27.377499999999994
+    },
+    {
+      "game": "sp80",
+      "v2fix": 36.904999999999994,
+      "v4sum": 10.7125,
+      "delta": -26.192499999999995
+    },
+    {
+      "game": "ft09",
+      "v2fix": 100.0,
+      "v4sum": 73.81,
+      "delta": -26.189999999999998
+    },
+    {
+      "game": "ls20",
+      "v2fix": 27.560000000000002,
+      "v4sum": 2.2075,
+      "delta": -25.352500000000003
+    },
+    {
+      "game": "sc25",
+      "v2fix": 46.92,
+      "v4sum": 25.63,
+      "delta": -21.290000000000003
+    },
+    {
+      "game": "ka59",
+      "v2fix": 24.314999999999998,
+      "v4sum": 4.615,
+      "delta": -19.699999999999996
+    },
+    {
+      "game": "vc33",
+      "v2fix": 40.8875,
+      "v4sum": 21.305,
+      "delta": -19.582500000000003
+    },
+    {
+      "game": "cn04",
+      "v2fix": 31.995,
+      "v4sum": 15.474999999999998,
+      "delta": -16.520000000000003
+    },
+    {
+      "game": "s5i5",
+      "v2fix": 16.4725,
+      "v4sum": 5.385,
+      "delta": -11.0875
+    },
+    {
+      "game": "su15",
+      "v2fix": 14.909999999999998,
+      "v4sum": 7.7749999999999995,
+      "delta": -7.134999999999999
+    },
+    {
+      "game": "lf52",
+      "v2fix": 9.545000000000002,
+      "v4sum": 2.7275,
+      "delta": -6.817500000000002
+    },
+    {
+      "game": "tn36",
+      "v2fix": 19.572499999999998,
+      "v4sum": 12.835,
+      "delta": -6.737499999999997
+    },
+    {
+      "game": "g50t",
+      "v2fix": 5.355,
+      "v4sum": 1.785,
+      "delta": -3.5700000000000003
+    },
+    {
+      "game": "wa30",
+      "v2fix": 3.3325,
+      "v4sum": 2.22,
+      "delta": -1.1124999999999998
+    },
+    {
+      "game": "sb26",
+      "v2fix": 97.61,
+      "v4sum": 97.33749999999999,
+      "delta": -0.27250000000000796
+    },
+    {
+      "game": "lp85",
+      "v2fix": 100.0,
+      "v4sum": 100.0,
+      "delta": 0.0
+    },
+    {
+      "game": "sk48",
+      "v2fix": 0.0,
+      "v4sum": 0.0,
+      "delta": 0.0
+    },
+    {
+      "game": "bp35",
+      "v2fix": 0.6675,
+      "v4sum": 1.4224999999999999,
+      "delta": 0.7549999999999999
+    }
+  ],
+  "publication_scope": "Archived Duck/Franzen cascade study; not the later arcduck2 rewrite."
+}

@@ -1,0 +1,14 @@
+test_actual_archived_wrapper_loses_bound_owner (__main__.EvidenceChecks) ... ok
+test_score_cap_cannot_credit_unsolved_level (__main__.EvidenceChecks) ... ok
+test_success_cache_retains_undo_and_excludes_failed_attempt (__main__.EvidenceChecks) ... ok
+test_successful_replay_is_unused_in_level_only_lifecycle (__main__.EvidenceChecks) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.015s
+
+OK
+
+All 200 scores reconstructed within 0.005; raw-log hashes match.
+Game-paired mean delta: -22.2442
+Game bootstrap 95% interval: (-30.410875000000004, -14.724050000000004)
+No new GPU run, model training, or competition submission performed.

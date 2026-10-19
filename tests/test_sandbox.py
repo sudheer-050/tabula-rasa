@@ -98,6 +98,7 @@ def test_commit_plan_runs_a_list_and_stops_on_level_up():
     out = sb.run("commit_plan(['ACTION1', ('ACTION1', None, None), 'ACTION1', {'name': 'ACTION1'}])")
     assert out.level_up and out.executed_actions == 3           # FakeGame levels at x>=5, started x=2
     assert len(g.game_run.history) == 3
+    assert out.used_commit_plan and out.blocked == 0
 
 
 def test_bare_action_blocked_once_probe_streak_hits_limit():
@@ -107,6 +108,7 @@ def test_bare_action_blocked_once_probe_streak_hits_limit():
     out = sb.run("r = action('ACTION1')\nprint(r.line())")
     assert out.executed_actions == 0 and "blocked" in out.text and "commit_plan" in out.text
     assert len(g.game_run.history) == 0          # truly refused, no action spent
+    assert out.blocked == 1 and not out.used_commit_plan
 
 
 def test_commit_plan_bypasses_the_gate_once_it_is_long_enough():
@@ -115,6 +117,7 @@ def test_commit_plan_bypasses_the_gate_once_it_is_long_enough():
     s.probe_streak = 2
     out = sb.run("commit_plan(['ACTION1', 'ACTION1', 'ACTION1'])")
     assert out.executed_actions == 3 and len(g.game_run.history) == 3
+    assert out.used_commit_plan and out.blocked == 0
 
 
 def test_commit_plan_itself_refuses_a_too_short_plan_while_gated():

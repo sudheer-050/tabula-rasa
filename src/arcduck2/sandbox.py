@@ -60,6 +60,8 @@ class ToolOutcome:
     level_up: bool = False
     game_over: bool = False
     won: bool = False
+    blocked: int = 0
+    used_commit_plan: bool = False
 
 
 @dataclass
@@ -161,6 +163,7 @@ class Sandbox:
         Stops early on the same conditions action() already stops a call for (level change,
         GAME_OVER, win, no-op); those don't need repeating here since they flow through
         action() itself."""
+        self._used_commit_plan_this_call = True
         try:
             actions = list(actions)
         except TypeError:
@@ -216,6 +219,7 @@ class Sandbox:
         """Execute ``code``. Blocking; call from a worker thread."""
         call = _Call(generated_tokens=generated_tokens, limit=self.cfg.max_actions_per_call)
         self._call = call
+        self._used_commit_plan_this_call = False
         self._inject()
         out = io.StringIO()
 
@@ -269,6 +273,7 @@ class Sandbox:
             parts.append("(no output)")
         body = truncate_middle("\n".join(parts), int(self.cfg.tool_output_tokens * self.cfg.chars_per_token))
         ok_results = [r for r in results if r.ok]
+        blocked = sum(1 for r in results if r.refused and r.error.startswith("blocked:"))
         return ToolOutcome(
             text=body,
             results=results,
@@ -278,4 +283,6 @@ class Sandbox:
             level_up=any(r.level_up for r in ok_results),
             game_over=any(r.game_over for r in ok_results),
             won=any(r.won for r in ok_results),
+            blocked=blocked,
+            used_commit_plan=self._used_commit_plan_this_call,
         )

@@ -31,8 +31,9 @@ METHOD
 2. State a hypothesis for the goal. Design the cheapest experiment that can disprove it, run it, and update `notes`.
 3. A meter that changes on every action is usually a step budget: running it out causes GAME_OVER. It is not progress.
 4. Once you understand the mechanics, write a small simulation or planner in Python, find the shortest plan offline, then execute it in one commit_plan([...]) call.
-5. After GAME_OVER or an unexpected result, diagnose the cause before RESET. After a level change, re-read the new board.
-6. Do not stall: if you hold a plausible plan, execute it. If you are unsure, run the cheapest informative action."""
+5. If the goal is a specific position or configuration (a navigation or arrangement puzzle), search backward from the goal, not just forward from the start, once you can identify the goal state: the goal usually has far fewer immediate predecessors than the start has successors, so backward or bidirectional search over your own simulation is often far cheaper than searching forward alone. This does not apply to puzzles whose goal is not a reachable position (e.g. matching a shown pattern); for those, plan forward from what you know.
+6. After GAME_OVER or an unexpected result, diagnose the cause before RESET. After a level change, re-read the new board.
+7. Do not stall: if you hold a plausible plan, execute it. If you are unsure, run the cheapest informative action."""
 
 INTRO_TEMPLATE = """New game. {levels} levels. Current level: {level}/{levels} (completed {done}).
 Available actions: {actions}.

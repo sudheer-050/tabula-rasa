@@ -79,8 +79,16 @@ class Config:
     # behavior. So: once a level racks up `probe_streak_limit` consecutive calls
     # each under `min_commit_batch` actions, bare action() calls are refused
     # (free) until the model commits a real plan via commit_plan([...]).
+    #
+    # probe_streak_limit was raised 6 -> 10 after a live run showed the failure
+    # mode cutting both ways: it fixed one game stuck forever at 175 actions on
+    # one level, but on a different game it forced a premature plan on a level
+    # that genuinely needed more exploration, which then cost MORE actions and
+    # reached fewer levels than the same game did without this gate (164
+    # actions/6 levels vs 295 actions/3 levels). A longer grace period is the
+    # direct fix: it still catches true infinite-drip, just later.
     min_commit_batch: int = 5
-    probe_streak_limit: int = 6
+    probe_streak_limit: int = 10
 
     # --- context ------------------------------------------------------------
     context_budget_tokens: int = 118 * 1024

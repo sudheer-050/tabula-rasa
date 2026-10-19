@@ -33,6 +33,8 @@ class Stats:
     no_tool_turns: int = 0
     model_failures: int = 0
     replay_actions: int = 0
+    blocked_calls: int = 0
+    commit_plan_calls: int = 0
 
 
 class GameAgent:
@@ -344,6 +346,9 @@ class GameAgent:
         outcome: ToolOutcome = await asyncio.to_thread(self.sandbox.run, code, reply.completion_tokens)
         if outcome.error:
             self.stats.tool_errors += 1
+        self.stats.blocked_calls += outcome.blocked
+        if outcome.used_commit_plan:
+            self.stats.commit_plan_calls += 1
         flags.update(level_up=outcome.level_up, game_over=outcome.game_over, acted=outcome.executed_actions > 0)
 
         s = self.session
@@ -389,7 +394,8 @@ class GameAgent:
             turn.append(observation)
         self.turns.append(turn)
         self._trace("tool", acts=outcome.executed_actions, err=outcome.error, up=outcome.level_up,
-                    over=outcome.game_over, gen=reply.completion_tokens, ptok=reply.prompt_tokens, cached=reply.cached_tokens)
+                    over=outcome.game_over, gen=reply.completion_tokens, ptok=reply.prompt_tokens, cached=reply.cached_tokens,
+                    blocked=outcome.blocked, via_commit=outcome.used_commit_plan, streak=self.session.probe_streak)
         return flags
 
     async def _auto_reset_if_stalled(self, flags: dict) -> None:
@@ -514,5 +520,6 @@ class GameAgent:
             if run is not None:
                 run.solver_note = (f"{note}; calls={self.stats.model_calls} gen={self.stats.generated_tokens} "
                                    f"trims={self.stats.trims} tool_err={self.stats.tool_errors} notool={self.stats.no_tool_turns} "
-                                   f"replay={self.stats.replay_actions}")
+                                   f"replay={self.stats.replay_actions} blocked={self.stats.blocked_calls} "
+                                   f"commit_plan={self.stats.commit_plan_calls}")
             self._trace("end", note=note)
